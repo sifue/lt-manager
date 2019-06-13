@@ -1,26 +1,34 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Link} from "react-router-dom";
+import { Container, Navbar, Nav } from 'react-bootstrap';
 
 function App() {
   return (
+
     <Router>
       <div>
         <Header />
-
-        <Route exact path="/" component={Home} />
-        <Route path="/about" component={About} />
-        <Route path="/topics" component={Topics} />
+        <Container>
+          <Route exact path="/events" component={Events} />
+          <Route path="/users" component={Users} />
+          <Route path="/new" component={New} />
+          <Route path="/topics" component={Topics} />
+        </Container>
       </div>
     </Router>
   );
 }
 
-function Home() {
-  return <h2>Home</h2>;
+function Events() {
+  return <h2>イベント一覧</h2>;
 }
 
-function About() {
-  return <h2>About</h2>;
+function Users() {
+  return <h2>ユーザー一覧</h2>;
+}
+
+function New() {
+  return <h2>イベント作成</h2>;
 }
 
 interface match {
@@ -68,17 +76,15 @@ function Topics({ match } : TopicsProps) {
 
 function Header() {
   return (
-    <ul>
-      <li>
-        <Link to="/">Home</Link>
-      </li>
-      <li>
-        <Link to="/about">About</Link>
-      </li>
-      <li>
-        <Link to="/topics">Topics</Link>
-      </li>
-    </ul>
+    <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
+      <Navbar.Brand href="/">LT管理ツール</Navbar.Brand>
+      <Nav className="mr-auto">
+        <Nav.Link><Link to="/events">イベント一覧</Link></Nav.Link>
+        <Nav.Link><Link to="/users">ユーザー一覧</Link></Nav.Link>
+        <Nav.Link><Link to="/new">イベント作成</Link></Nav.Link>
+        <Nav.Link><Link to="/topics">Topics</Link></Nav.Link>
+      </Nav>
+    </Navbar>
   );
 }
 
