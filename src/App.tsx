@@ -7,13 +7,25 @@ function App() {
       <div>
         <Header />
         <div className="container mt-3" >
-          <Route exact path="/events" component={Events} />
+          <Route path="/" exact component={Home} />
+          <Route path="/events" component={Events} />
           <Route path="/users" component={Users} />
           <Route path="/new" component={New} />
-          <Route path="/topics" component={Topics} />
         </div>
       </div>
     </Router>
+  );
+}
+
+function Home() {
+  return (
+    <div className="jumbotron">
+      <h1 className="display-4">LTマネージャー</h1>
+      <p className="lead">LTマネージャーは、LT(ライトニングトークという短いプレゼンテーション)をするイベントを管理するツールです。LTの登録のほか、LTへのコメントを残したりすることができます。</p>
+      <hr className="my-4" />
+      <p>特定のドメインのGoogleアカウントでログインすることで、その組織だけのLTイベントを閲覧、管理したり、コメントをすることができます。</p>
+      <button className="btn btn-primary btn-lg" role="button">ログイン</button>
+    </div>
   );
 }
 
@@ -27,49 +39,6 @@ function Users() {
 
 function New() {
   return <h2>イベント作成</h2>;
-}
-
-interface match {
-  params: any;
-  isExact: boolean;
-  path: string;
-  url: string;
-}
-
-type TopicProps = {
-  match : match
-}
-
-function Topic({ match } : TopicProps) {
-  return <h3>Requested Param: {match.params.id}</h3>;
-}
-
-type TopicsProps = {
-  match : match
-}
-
-function Topics({ match } : TopicsProps) {
-  return (
-    <div>
-      <h2>Topics</h2>
-
-      <ul>
-        <li>
-          <Link to={`${match.url}/components`}>Components</Link>
-        </li>
-        <li>
-          <Link to={`${match.url}/props-v-state`}>Props v. State</Link>
-        </li>
-      </ul>
-
-      <Route path={`${match.path}/:id`} component={Topic} />
-      <Route
-        exact
-        path={match.path}
-        render={() => <h3>Please select a topic.</h3>}
-      />
-    </div>
-  );
 }
 
 function Header() {
