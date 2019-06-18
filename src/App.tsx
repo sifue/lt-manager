@@ -1,5 +1,11 @@
-import React from "react";
-import {BrowserRouter as Router, Route, Link} from "react-router-dom";
+import React, { Component } from "react";
+import {
+  BrowserRouter as Router,
+  Route,
+  Link,
+  Redirect,
+  withRouter
+} from "react-router-dom";
 
 function App() {
   return (
@@ -7,25 +13,63 @@ function App() {
       <div>
         <Header />
         <div className="container mt-3" >
-          <Route path="/" exact component={Home} />
-          <Route path="/events" component={Events} />
-          <Route path="/users" component={Users} />
-          <Route path="/new" component={New} />
+          <Route path="/" exact component={Login} />
+          <PrivateRoute path="/events" component={Events} />
+          <PrivateRoute path="/users" component={Users} />
+          <PrivateRoute path="/new" component={New} />
         </div>
       </div>
     </Router>
   );
 }
 
-function Home() {
+const fakeAuth = {
+  isAuthenticated: false,
+  authenticate(cb: () => void) {
+    this.isAuthenticated = true;
+    setTimeout(cb, 100); // fake async
+  },
+  signout(cb: () => void) {
+    this.isAuthenticated = false;
+    setTimeout(cb, 100);
+  }
+};
+
+const AuthButton = withRouter(
+  ({ history }) =>
+    fakeAuth.isAuthenticated ? (
+      <p>
+        Welcome!{" "}
+        <button className="btn btn-outline-light my-2 my-sm-0" type="submit"
+          onClick={() => {
+            fakeAuth.signout(() => history.push("/"));
+          }}
+        >
+          Sign out
+        </button>
+      </p>
+    ) : (
+      <p>You are not logged in.</p>
+    )
+);
+
+function PrivateRoute({ component: Component, ...rest }) {
   return (
-    <div className="jumbotron">
-      <h1 className="display-4">LTマネージャー</h1>
-      <p className="lead">LTマネージャーは、LT(ライトニングトークという短いプレゼンテーション)をするイベントを管理するツールです。LTの登録のほか、LTへのコメントを残したりすることができます。</p>
-      <hr className="my-4" />
-      <p>特定のドメインのGoogleアカウントでログインすることで、その組織だけのLTイベントを閲覧、管理したり、コメントをすることができます。</p>
-      <button className="btn btn-primary btn-lg" role="button">ログイン</button>
-    </div>
+    <Route
+      {...rest}
+      render={props =>
+        fakeAuth.isAuthenticated ? (
+          <Component {...props} />
+        ) : (
+          <Redirect
+            to={{
+              pathname: "/",
+              state: { from: props.location }
+            }}
+          />
+        )
+      }
+    />
   );
 }
 
@@ -61,10 +105,36 @@ function Header() {
             <Link className="nav-link" to="/new" href="#">イベント作成</Link>
           </li>
         </ul>
-        <button className="btn btn-outline-light my-2 my-sm-0" type="submit">ログイン</button>
+        <AuthButton/>
       </div>
     </nav>
   );
+}
+
+class Login extends Component {
+  state = { redirectToReferrer: false };
+
+  login = () => {
+    fakeAuth.authenticate(() => {
+      this.setState({ redirectToReferrer: true });
+    });
+  };
+
+  render() {
+    let { from } = this.props['location'].state || { from: { pathname: "/" } };
+    let { redirectToReferrer } = this.state;
+    if (redirectToReferrer) return <Redirect to={from} />;
+
+    return (
+      <div className="jumbotron">
+        <h1 className="display-4">LTマネージャー</h1>
+        <p className="lead">LTマネージャーは、LT(ライトニングトークという短いプレゼンテーション)をするイベントを管理するツールです。LTの登録のほか、LTへのコメントを残したりすることができます。</p>
+        <hr className="my-4" />
+        <p>特定のドメインのGoogleアカウントでログインすることで、その組織だけのLTイベントを閲覧、管理したり、コメントをすることができます。</p>
+        <button className="btn btn-primary btn-lg" role="presentation" onClick={this.login} >ログイン</button>
+      </div>
+    );
+  }
 }
 
 export default App;
